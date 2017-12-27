@@ -1,0 +1,83 @@
+/* nta.rule (ver 6/20/01) number to ascii dollars
+ *
+ *  nta 876,543.21
+ *
+ *  Eight Hundred Seventy Six Thousand Five Hundred Fourty Three and 21/100
+ */
+
+NTA = ('$ / .EMPTY) PMT *  ;
+
+DO [-,-] => *1 *2 ;
+
+PMT = .DIG ( ', THR :THO[2] /* -,---.-- */
+           / .DIG ( ', THR :THO[3] /* --,---.-- */
+                  / .DIG ( ', THR :THO[4] /* ---,---.-- */
+                         / .DIG (  .DIG ( .DIG ( :DEC[6] ( '. TWO :DO[2]
+                                                         / .EMPTY )
+                                               )
+                                        / .EMPTY :DEC[5] ( '. TWO :DO[2]
+                                                         / .EMPTY )
+                                        )
+                                / .EMPTY :DEC[4] ( '. TWO :DO[2]
+                                                 / .EMPTY )
+                                )
+                         / .EMPTY :NUM[3] ( '. TWO :DO[2]
+                                          / .EMPTY )
+                         )
+                  / .EMPTY :NUM[2] ( '. TWO :DO[2]
+                                   / .EMPTY )
+                  )
+           / .EMPTY :NUM[1] ( '. TWO :DO[2]
+                            / .EMPTY )
+           ) ;
+
+THR = .DIG .DIG .DIG :NUM[3] ( '. TWO :DO[2] / .EMPTY ) ;
+
+
+TWO = .DIG .DIG :DEC[2] ;
+DEC [-,-,-,-,-,-] => THO[*1,*2,*3,NUM[*4,*5,*6]]
+      [-,-,-,-,-] => THO[*1,*2,NUM[*3,*4,*5]]
+        [-,-,-,-] => THO[*1,NUM[*2,*3,*4]]
+            [-,-] => " and " *1*2 "/100" ;
+
+THO [-,-,-,-] => NUM[*1,*2,*3] " Thousand" *4
+      [-,-,-] =>    NUM[*1,*2] " Thousand" *3
+        [-,-] =>       NUM[*1] " Thousand" *2 ;
+
+NUM [-,-,-] => UNI[*1] " Hundred" TEN[*2,*3]
+      [-,-] => TEN[*1,*2]
+        [-] => UNI[*1] ;
+
+TEN ['0,-] => UNI[*2]
+    ['1,-] => TEEN[*2]
+    ['2,-] => " Twenty" UNI[*2]
+    ['3,-] => " Thirty" UNI[*2]
+    ['4,-] => " Fourty" UNI[*2]
+    ['5,-] => " Fifty"  UNI[*2]
+    ['6,-] => " Sixty"  UNI[*2]
+    ['7,-] => " Seventy" UNI[*2]
+    ['8,-] => " Eighty" UNI[*2]
+    ['9,-] => " Ninety" UNI[*2] ;
+
+TEEN ['0] => " Ten"
+     ['1] => " Eleven"
+     ['2] => " Twelve"
+     ['3] => " Thirteen"
+     ['4] => " Fourteen"
+     ['5] => " Fifteen"
+     ['6] => " Sixteen"
+     ['7] => " Seventeen"
+     ['8] => " Eighteen"
+     ['9] => " Nineteen" ;
+
+UNI ['0] => ""
+    ['1] => " One"
+    ['2] => " Two"
+    ['3] => " Three"
+    ['4] => " Four"
+    ['5] => " Five"
+    ['6] => " Six"
+    ['7] => " Seven"
+    ['8] => " Eight"
+    ['9] => " Nine" ;
+
